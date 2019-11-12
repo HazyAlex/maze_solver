@@ -22,7 +22,6 @@ const WALL_LIMIT: u8 = 50;
 //  a PATH is selected by one of the algorithms
 const SOLVED_COLOR: Rgba<u8> = Rgba([255, 0, 0, 0]);
 
-
 pub fn parse_image(args: &mut Args) -> DynamicImage {
     // Get the arguments (image name)
     let args = args.nth(1);
@@ -194,10 +193,9 @@ pub fn maze_to_adjacency_list(maze: &Vec<Vec<u8>>) -> HashMap<(usize, usize), Ve
 
 fn add_node(
     adj_list: &mut HashMap<(usize, usize), Vec<(usize, usize)>>,
-    (x, y): (usize, usize), // Current node
+    (x, y): (usize, usize),   // Current node
     (dx, dy): (usize, usize), // Next node
-)
-{
+) {
     // If a key doesn't exist, add it
     if !adj_list.contains_key(&(x, y)) {
         let mut vec = Vec::with_capacity(4);
