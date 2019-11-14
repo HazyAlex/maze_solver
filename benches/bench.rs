@@ -6,16 +6,16 @@ mod tests {
     extern crate test;
     use test::Bencher;
 
-    const FILENAME: &str = "maze_1000_1000.png";
+    const FILENAME: &str = "maze_100_100_complex.png";
 
     use super::maze_solver::get_image;
     use super::maze_solver::img_to_vec;
     use super::maze_solver::maze_to_adjacency_list;
 
+    use super::maze_solver::algorithms::breadth_first;
+    use super::maze_solver::algorithms::depth_first;
     use super::maze_solver::algorithms::simple_always_left;
     use super::maze_solver::algorithms::wall_follower;
-    use super::maze_solver::algorithms::depth_first;
-    use super::maze_solver::algorithms::breadth_first;
 
     #[bench]
     fn bench_get_image(b: &mut Bencher) {

@@ -47,5 +47,3 @@ impl<T> Queue<T> {
         self.item.len() == 0
     }
 }
-
-
