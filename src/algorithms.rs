@@ -2,11 +2,12 @@ use crate::constants::{PATH, WALL};
 use crate::data_structures::{Queue, Stack};
 
 use std::collections::HashMap;
+use std::hash::BuildHasher;
 
 // ---------
 // Utilities
 // ---------
-fn get_start(maze: &Vec<Vec<u8>>) -> (usize, usize) {
+fn get_start(maze: &[Vec<u8>]) -> (usize, usize) {
     // Check the top
     for (col, &square) in maze[0].iter().enumerate() {
         if square != WALL {
@@ -25,7 +26,7 @@ fn get_start(maze: &Vec<Vec<u8>>) -> (usize, usize) {
     std::process::exit(1);
 }
 
-fn get_end(maze: &Vec<Vec<u8>>) -> (usize, usize) {
+fn get_end(maze: &[Vec<u8>]) -> (usize, usize) {
     // Check the bottom
     for (i, &row) in maze[maze.len() - 1].iter().enumerate() {
         if row == PATH {
@@ -44,7 +45,7 @@ fn get_end(maze: &Vec<Vec<u8>>) -> (usize, usize) {
     std::process::exit(1);
 }
 
-fn path_up(maze: &Vec<Vec<u8>>, x: usize, y: usize, visited_square: &Vec<Vec<bool>>) -> bool {
+fn path_up(maze: &[Vec<u8>], x: usize, y: usize, visited_square: &[Vec<bool>]) -> bool {
     if x != 0 && maze[x - 1][y] == PATH && !visited_square[x - 1][y] {
         return true;
     }
@@ -52,7 +53,7 @@ fn path_up(maze: &Vec<Vec<u8>>, x: usize, y: usize, visited_square: &Vec<Vec<boo
     false
 }
 
-fn path_right(maze: &Vec<Vec<u8>>, x: usize, y: usize, visited_square: &Vec<Vec<bool>>) -> bool {
+fn path_right(maze: &[Vec<u8>], x: usize, y: usize, visited_square: &[Vec<bool>]) -> bool {
     if y != (maze[x].len() - 1) && maze[x][y + 1] == PATH && !visited_square[x][y + 1] {
         return true;
     }
@@ -60,7 +61,7 @@ fn path_right(maze: &Vec<Vec<u8>>, x: usize, y: usize, visited_square: &Vec<Vec<
     false
 }
 
-fn path_left(maze: &Vec<Vec<u8>>, x: usize, y: usize, visited_square: &Vec<Vec<bool>>) -> bool {
+fn path_left(maze: &[Vec<u8>], x: usize, y: usize, visited_square: &[Vec<bool>]) -> bool {
     if y != 0 && maze[x][y - 1] == PATH && !visited_square[x][y - 1] {
         return true;
     }
@@ -68,7 +69,7 @@ fn path_left(maze: &Vec<Vec<u8>>, x: usize, y: usize, visited_square: &Vec<Vec<b
     false
 }
 
-fn path_down(maze: &Vec<Vec<u8>>, x: usize, y: usize, visited_square: &Vec<Vec<bool>>) -> bool {
+fn path_down(maze: &[Vec<u8>], x: usize, y: usize, visited_square: &[Vec<bool>]) -> bool {
     if x != (maze.len() - 1) && maze[x + 1][y] == PATH && !visited_square[x + 1][y] {
         return true;
     }
@@ -80,7 +81,7 @@ fn path_down(maze: &Vec<Vec<u8>>, x: usize, y: usize, visited_square: &Vec<Vec<b
 // ------------
 
 // ALWAYS LEFT
-pub fn simple_always_left(maze: &Vec<Vec<u8>>) -> Vec<(usize, usize)> {
+pub fn simple_always_left(maze: &[Vec<u8>]) -> Vec<(usize, usize)> {
     let mut solved_path = Vec::with_capacity(maze.len() * maze[0].len());
     let mut visited_square = vec![vec![false; maze[0].len()]; maze.len()];
 
@@ -149,7 +150,7 @@ enum Direction {
     UP,
 }
 
-pub fn wall_follower(maze: &Vec<Vec<u8>>) -> Vec<(usize, usize)> {
+pub fn wall_follower(maze: &[Vec<u8>]) -> Vec<(usize, usize)> {
     let mut solved_path = Vec::with_capacity(maze.len() * maze[0].len());
     let mut visited_square = vec![vec![false; maze[0].len()]; maze.len()];
 
@@ -248,8 +249,8 @@ pub fn wall_follower(maze: &Vec<Vec<u8>>) -> Vec<(usize, usize)> {
 }
 
 fn check_visit_later(
-    maze: &Vec<Vec<u8>>,
-    visited_square: &Vec<Vec<bool>>,
+    maze: &[Vec<u8>],
+    visited_square: &[Vec<bool>],
     current_path: (usize, usize),
     visit_later: &mut Stack<(usize, usize)>,
     direction: Direction,
@@ -273,9 +274,9 @@ fn check_visit_later(
 // ----------------------
 //  DEPTH FIRST SEARCH
 // ----------------------
-pub fn depth_first(
-    maze: &Vec<Vec<u8>>,
-    adj_list: &HashMap<(usize, usize), Vec<(usize, usize)>>,
+pub fn depth_first<S: BuildHasher>(
+    maze: &[Vec<u8>],
+    adj_list: &HashMap<(usize, usize), Vec<(usize, usize)>, S>,
 ) -> Vec<(usize, usize)> {
     let mut marked = vec![vec![false; maze[0].len()]; maze.len()];
     let mut stack = Stack::new();
@@ -311,9 +312,9 @@ pub fn depth_first(
 // ----------------------
 //  BREADTH FIRST SEARCH
 // ----------------------
-pub fn breadth_first(
-    maze: &Vec<Vec<u8>>,
-    adj_list: &HashMap<(usize, usize), Vec<(usize, usize)>>,
+pub fn breadth_first<S: BuildHasher>(
+    maze: &[Vec<u8>],
+    adj_list: &HashMap<(usize, usize), Vec<(usize, usize)>, S>,
 ) -> Vec<(usize, usize)> {
     let mut marked = vec![vec![false; maze[0].len()]; maze.len()];
 
@@ -347,6 +348,62 @@ pub fn breadth_first(
         }
         // After the whole layer has been visited,
         //  visit the next layer or a node from same layer
+    }
+
+    results
+}
+
+// -----------------------------------
+//  BACKTRACKING BREADTH FIRST SEARCH
+// -----------------------------------
+pub fn backtracking_breadth_first<S: BuildHasher>(
+    maze: &[Vec<u8>],
+    adj_list: &HashMap<(usize, usize), Vec<(usize, usize)>, S>,
+) -> Vec<(usize, usize)> {
+    let mut marked = vec![vec![false; maze[0].len()]; maze.len()];
+
+    let mut queue = Queue::new();
+
+    let maze_start = get_start(&maze);
+    let maze_end = get_end(&maze);
+
+    let mut parents: HashMap<(usize, usize), (usize, usize)> =
+        HashMap::with_capacity(adj_list.len());
+
+    let mut results = Vec::with_capacity(adj_list.len());
+    results.push(maze_start);
+
+    queue.enqueue(maze_start);
+    marked[maze_start.0][maze_start.1] = true;
+
+    while !queue.empty() {
+        let square = queue.dequeue();
+        let nodes = adj_list.get(&square).unwrap();
+
+        // Stop if we reached the end
+        if square == maze_end {
+            break;
+        }
+
+        for node in nodes.iter() {
+            // If they weren't visited, visit them
+            if !marked[node.0][node.1] {
+                queue.enqueue(*node);
+                parents.insert(*node, square);
+                marked[node.0][node.1] = true;
+            }
+        }
+        // After the whole layer has been visited,
+        //  visit the next layer or a node from same layer
+    }
+
+    // We now backtrack from the end to the beginning
+    //  to get the best path
+    let mut current = maze_end;
+
+    while current != maze_start {
+        results.push(current);
+        current = *parents.get(&current).unwrap();
     }
 
     results

@@ -12,10 +12,7 @@ mod tests {
     use super::maze_solver::img_to_vec;
     use super::maze_solver::maze_to_adjacency_list;
 
-    use super::maze_solver::algorithms::breadth_first;
-    use super::maze_solver::algorithms::depth_first;
-    use super::maze_solver::algorithms::simple_always_left;
-    use super::maze_solver::algorithms::wall_follower;
+    use super::maze_solver::algorithms::*;
 
     #[bench]
     fn bench_get_image(b: &mut Bencher) {
@@ -82,6 +79,17 @@ mod tests {
 
         b.iter(|| {
             breadth_first(&maze, &adj_list);
+        });
+    }
+
+    #[bench]
+    fn bench_backtracking_breadth_first_search(b: &mut Bencher) {
+        let img = get_image(String::from(FILENAME));
+        let maze = img_to_vec(&img);
+        let adj_list = maze_to_adjacency_list(&maze);
+
+        b.iter(|| {
+            backtracking_breadth_first(&maze, &adj_list);
         });
     }
 }

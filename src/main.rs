@@ -9,6 +9,7 @@ use maze_solver::output_maze_solution;
 use maze_solver::parse_image;
 use maze_solver::print_img;
 
+use maze_solver::algorithms::backtracking_breadth_first;
 use maze_solver::algorithms::breadth_first;
 use maze_solver::algorithms::depth_first;
 use maze_solver::algorithms::simple_always_left;
@@ -24,6 +25,7 @@ fn main() {
         simple_always_left(&maze),  // Algorithm
         "examples/always_left.png"  // Output image
     );
+
     output_maze_solution(
         &img,
         wall_follower(&maze),
@@ -43,5 +45,11 @@ fn main() {
         &img,
         breadth_first(&maze, &adj_list),
         "examples/breadth_first.png",
+    );
+
+    output_maze_solution(
+        &img,
+        backtracking_breadth_first(&maze, &adj_list),
+        "examples/backtracking_breadth_first.png",
     );
 }

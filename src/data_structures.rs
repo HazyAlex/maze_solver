@@ -1,4 +1,5 @@
 // STACK
+#[derive(Default)]
 pub struct Stack<T> {
     item: Vec<T>,
 }
@@ -17,11 +18,12 @@ impl<T> Stack<T> {
     }
 
     pub fn empty(&self) -> bool {
-        self.item.len() == 0
+        self.item.is_empty()
     }
 }
 
 // QUEUE
+#[derive(Default)]
 pub struct Queue<T> {
     item: Vec<T>,
 }
@@ -36,7 +38,7 @@ impl<T> Queue<T> {
     }
 
     pub fn dequeue(&mut self) -> T {
-        if self.item.len() == 0 {
+        if self.item.is_empty() {
             panic!("Can't dequeue an empty queue!");
         }
 
@@ -44,6 +46,6 @@ impl<T> Queue<T> {
     }
 
     pub fn empty(&self) -> bool {
-        self.item.len() == 0
+        self.item.is_empty()
     }
 }

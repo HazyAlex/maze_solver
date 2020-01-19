@@ -38,22 +38,20 @@ pub fn parse_image(args: &mut Args) -> DynamicImage {
 }
 
 pub fn get_image(filename: String) -> DynamicImage {
-    let image = match image::open(filename) {
+    match image::open(filename) {
         Ok(image) => image,
         Err(_) => {
             eprintln!("Image not found! Exiting..");
             std::process::exit(1);
         }
-    };
-
-    image
+    }
 }
 
 pub fn print_img(img: &DynamicImage) {
     for pixel in img.pixels() {
         if pixel.0 == 0 {
             // When we reach a new line, print a new line
-            println!("");
+            println!();
         }
 
         // If the RGB(r, g, b) values are bellow a certain level,
@@ -65,7 +63,7 @@ pub fn print_img(img: &DynamicImage) {
 
         print!("-"); // Path
     }
-    println!("");
+    println!();
 }
 
 pub fn img_to_vec(img: &DynamicImage) -> Vec<Vec<u8>> {
@@ -113,7 +111,7 @@ pub fn img_to_vec(img: &DynamicImage) -> Vec<Vec<u8>> {
     matrix
 }
 
-pub fn print_maze_solution(maze: &Vec<Vec<u8>>, solution: Vec<(usize, usize)>) {
+pub fn print_maze_solution(maze: &[Vec<u8>], solution: Vec<(usize, usize)>) {
     for (i, row) in maze.iter().enumerate() {
         for (j, &col) in row.iter().enumerate() {
             if col == WALL {
@@ -129,7 +127,7 @@ pub fn print_maze_solution(maze: &Vec<Vec<u8>>, solution: Vec<(usize, usize)>) {
             print!("*"); // Path that wasn't traversed
         }
 
-        println!(""); // Newline
+        println!(); // Newline
     }
 }
 
@@ -150,7 +148,7 @@ pub fn output_maze_solution(img: &DynamicImage, solution: Vec<(usize, usize)>, o
     }
 }
 
-pub fn maze_to_adjacency_list(maze: &Vec<Vec<u8>>) -> HashMap<(usize, usize), Vec<(usize, usize)>> {
+pub fn maze_to_adjacency_list(maze: &[Vec<u8>]) -> HashMap<(usize, usize), Vec<(usize, usize)>> {
     let mut adj_list = HashMap::with_capacity(maze.len() * maze[0].len());
 
     for (i, row) in maze.iter().enumerate() {
@@ -196,20 +194,16 @@ fn add_node(
     (x, y): (usize, usize),   // Current node
     (dx, dy): (usize, usize), // Next node
 ) {
-    // If a key doesn't exist, add it
-    if !adj_list.contains_key(&(x, y)) {
-        let mut vec = Vec::with_capacity(4);
-        vec.push((dx, dy));
-
-        adj_list.insert((x, y), vec);
-        return;
-    }
-
     match adj_list.get_mut(&(x, y)) {
         Some(vec) => {
             vec.push((dx, dy));
-            vec
         }
-        None => &mut vec![(dx, dy)],
+        None => {
+            // If a key doesn't exist, add it
+            let mut vec = Vec::with_capacity(4);
+            vec.push((dx, dy));
+
+            adj_list.insert((x, y), vec);
+        }
     };
 }
